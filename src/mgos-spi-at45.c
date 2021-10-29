@@ -5,6 +5,7 @@
 #include "mgos_debug.h"
 #include "mgos_gpio.h"
 #include "mgos-spi-at45.h"
+#include "mgos-spi-at45-impl.h"
 
 void ati_spi_flash_destroy(struct ati_spi_flash* _dev){
     if ( NULL != _dev ){

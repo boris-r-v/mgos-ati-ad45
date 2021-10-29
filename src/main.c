@@ -7,6 +7,7 @@
 #include "mgos_gpio.h"
 #include "mgos_timers.h"
 #include "mgos-spi-at45.h"
+#include "mgos-spi-at45-impl.h"
 
 static const uint8_t ROM_CS = 5;
 static const uint8_t AD_CS = 22;

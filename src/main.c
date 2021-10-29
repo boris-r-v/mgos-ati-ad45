@@ -18,60 +18,37 @@ struct ati_spi_flash* flash;
 
 
 static int _step = 0;
-#define data_len 4
+#define _data_len 2064
 
 void timer_cb_rom(void *arg) {
     ++_step;
-    if (_step % 2 == 1) {/*write to buffer*/
-        uint8_t data[data_len] = {0};
-        int i;
-        for (i = 0; i < sizeof(data); ++i) data[i] = i * 10 + _step;
-        ati_spi_flash_write_sram_buffer(flash, data, sizeof(data), 0);
-        LOG(LL_INFO, ("ROM-SPI WRITE data to buffer %02X, %02X %02X, %02X", data[0], data[1], data[2], data[3]));
+    uint32_t _addr = 48+_step;
+    uint8_t _data[_data_len]={0};
+    int i;
+    for (i=0; i<_data_len;++i) _data[i] = i;
 
-        for (i = 0; i < sizeof(data); ++i) data[i] = 0;
-        ati_spi_flash_read_sram_buffer(flash, data, sizeof(data), 0);
-        LOG(LL_INFO, ("ROM-SPI READ data to buffer %02X, %02X %02X, %02X", data[0], data[1], data[2], data[3]));
+    uint8_t ret_write = ati_spi_flash_write_data( flash, _data, _data_len, _addr );
+    uint8_t _rdata[_data_len]={0};
+    uint8_t ret_read = ati_spi_flash_read_data( flash, _rdata, _data_len, _addr );
 
-        uint8_t tx_data[4] = {0x83};  /*WRITE_BUFFER_TO_MAIN_MEMORY_PAGE with build-in-erase. p.p. 7.2*/
-        if (FLASH_OK != ati_spi_flash_data_hd_exchange(flash, tx_data, sizeof(tx_data), NULL, 0, 0)) {
-            LOG(LL_INFO, ("ROM-SPI fail write buffer to main memory "));
-            return;
+    if ( ret_write || ret_read )
+        LOG(LL_INFO, ("Offset %d WRITE/READ status %d : %d", _step, ret_write, ret_read ) );
+
+    bool equal = true;
+    for (i=0; i<_data_len;++i) {
+        if ( _data[i] != _rdata[i] ) {
+            equal = false;
+            LOG(LL_INFO, ("!!! ROM-SPI WRITE/READ i:%d not equal %02X != %02X step: %d, size: %d", i, _data[i], _rdata[i], _step, _data_len ) );
+            break;
         }
-
-    /*move from buffer to main memory*/
-        uint8_t st = ati_spi_flash_read_status( flash );
-        while (false == ati_spi_flash_is_idle(st)) {
-            LOG(LL_INFO, ("ROM-SPI status %02x", st ) );
-            LOG(LL_INFO, ("ROM-SPI status is busy "));
-            mgos_msleep(1);
-            st = ati_spi_flash_read_status( flash );
-        }
-
-        LOG(LL_INFO, ("Write Complete, status %02X", st));
     }
-        /*read from main memory*/
-    if ( _step % 2 == 0 ){
-        uint8_t tx_data[4]={0xE8};  /*WRITE_BUFFER_TO_MAIN_MEMORY_PAGE with build-in-erase. p.p. 7.2*/
-        uint8_t data[data_len] = {0};
-        //tx_data[4] = tx_data[5] = tx_data[6] = tx_data[7] =0xff;
-        LOG(LL_INFO, ("ROM-SPI 1 READ data from main memory %02X, %02X %02X, %02X", data[0], data[1], data[2], data[3] ) );
-        if (FLASH_OK != ati_spi_flash_data_hd_exchange( flash, tx_data, sizeof(tx_data), data, sizeof (data), 4)) {
-            LOG(LL_INFO, ("ROM-SPI fail write buffer to main memory " ) );
-            return ;
-        }
-        LOG(LL_INFO, ("ROM-SPI 2 READ data from main memory %02X, %02X %02X, %02X", data[0], data[1], data[2], data[3] ) );
-
-    }
-
-
+    LOG(LL_INFO, ("Offset %d W/R data is %s", _step, (equal ? "EQUAL" : "NOT EQUAL") ) );
 }
+#define data_len 24
 void timer_cb_api(void *arg)
 {
 
     ++_step;
-
-
     if ( _step % 2 == 1 ){
         uint8_t data[data_len] = {0};
         int i;
@@ -133,7 +110,8 @@ enum mgos_app_init_result mgos_app_init(void)
         return MGOS_APP_INIT_ERROR;
     }
 
-//    mgos_set_timer(1000, true, timer_cb_rom, NULL);
-    mgos_set_timer(1000, true, timer_cb_api, NULL);
+//    mgos_set_timer(100, true, timer_cb_rom, NULL);
+//    mgos_set_timer(1000, true, timer_cb_api, NULL);
     return MGOS_APP_INIT_SUCCESS;
 }
+

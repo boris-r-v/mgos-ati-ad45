@@ -14,7 +14,7 @@
 /**
  * Коды результатов операций с флешкой
  */
-enum ATI_FLASH_OP_RETURN_VALUE {FLASH_OK, FLASH_FAIL, FLASH_BUSY};
+enum ATI_FLASH_OP_RETURN_VALUE {FLASH_OK=0x00, FLASH_FAIL=0x01, FLASH_BUSY=0x02, FLASH_SOME_ERR=0x04 };
 /**
  * Описание конфигурации драйвера флешки
  */
@@ -152,6 +152,13 @@ uint8_t ati_spi_flash_write_sram_buffer(struct ati_spi_flash* _dev, uint8_t cons
  */
 uint8_t ati_spi_flash_read_sram_buffer(struct ati_spi_flash* _dev, uint8_t* _data, size_t _data_len, uint16_t _offset );
 /**
+ * Copy some page from AD45xxx to SRAM buffer (see: point 11.1 and 23.2 in datasheet)
+ * @param _dev: flash handle struct
+ * @param _page_number: number of page for copy
+ * @return: FLASH_OK - if operation success, or error code from enum ATI_FLASH_OP_RETURN_VALUE
+ */
+uint8_t ati_spi_flash_copy_page_to_sram_buffer(struct ati_spi_flash* _dev, uint16_t _page_number );
+/**
  *
  * @param _dev: flash handle struct
  */
@@ -174,5 +181,27 @@ uint8_t ati_spi_flash_write_from_buffer_to_page (struct ati_spi_flash* _dev, uin
  * @return: FLASH_OK - if operation success, or error code from enum ATI_FLASH_OP_RETURN_VALUE
  */
 uint8_t ati_spi_flash_read_from_page_and_offset(struct ati_spi_flash* _dev, uint8_t* _data, size_t _data_len, uint16_t _page_number, uint16_t _offset);
+
+/**
+ * Write data to flash with some address
+ * @param _dev: flash handle struct
+ * @param _data: buffer with data for write
+ * @param _data_len: size of data buffer
+ * @param _addr: flash address for starting write
+ * @return: FLASH_OK - if operation success, or error code from enum ATI_FLASH_OP_RETURN_VALUE
+ */
+
+uint8_t ati_spi_flash_write_data(struct ati_spi_flash* _dev, uint8_t const* _data, size_t _data_len, uint32_t _addr );
+
+/**
+ * Read data to flash with some address
+ * @param _dev: flash handle struct
+ * @param _data: buffer with data for write
+ * @param _data_len: size of data buffer
+ * @param _addr: flash address for starting write
+ * @return: FLASH_OK - if operation success, or error code from enum ATI_FLASH_OP_RETURN_VALUE
+ */
+
+uint8_t ati_spi_flash_read_data(struct ati_spi_flash* _dev, uint8_t* _data, size_t _data_len, uint32_t _addr );
 
 #endif //TEST_ROM_AT45DB021D_MGOS_SPI_AT4G_H

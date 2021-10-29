@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/deps/core" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/freertos" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/mbedtls" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/modules/mbedtls" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/modules/mongoose-os" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/mongoose" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/spi" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/vfs-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/vfs-fs-lfs" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/vfs-fs-spiffs" vcs="Git" />
+  </component>
+</project>
